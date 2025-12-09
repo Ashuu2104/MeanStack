@@ -1,0 +1,41 @@
+db.getMongo().getDBs();
+// show dbs;
+use('6A18')
+// use 6A18;
+db.createCollection("Stu");
+
+db.Stu.insertOne({
+    name: "Ashu",
+    Age: 21,
+    Subject: "Computer Science & Engi"
+})
+
+db.Stu.insertMany([
+    {
+        name: "Raju",
+        Age: 22,
+        Subject: "Mechanical Engi"
+    },
+    {
+        name: "Vijay",
+        Age: 23,
+        Subject: "Civil Engi"
+    },
+    {
+        name: "Suresh",
+        Age: 21,
+        Subject: "Electrical Engi"
+    }
+]);
+
+db.Stu.updateOne(
+    { name: "Raju" },
+    { $set: { Color: "Red" } }
+);
+
+db.Stu.updateMany(
+    { Age: { $gt: 21 } },
+    { $set: { Status: "Active" } }
+);
+
+db.Stu.find().pretty();
