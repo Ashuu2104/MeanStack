@@ -1,0 +1,141 @@
+show dbs;
+
+use Practicals;
+
+db.createCollection("users");
+db.createCollection("employees");
+db.createCollection("products");
+db.createCollection("articles");
+db.createCollection("students");
+db.createCollection("customers");
+db.createCollection("orders");
+
+db.users.insertMany([
+  { _id: 1, name: "Alice",  email: "alice@example.com",  age: 25, status: "active",   role: "admin" },
+  { _id: 2, name: "Bob",    email: "bob@example.com",    age: 19, status: "inactive", role: "user" },
+  { _id: 3, name: "Charlie",email: "charlie@example.com",          status: "active",   role: "user" },
+  { _id: 4, name: "David",  email: "xyz@gmail.com",      age: 30, status: "inactive", role: "admin" }
+]);
+
+db.employees.insertMany([
+  { empId: 101, name: "Eve",    age: 28, department: "IT",      salary: 60000 },
+  { empId: 102, name: "Frank",  age: 35, department: "HR",      salary: 35000 },
+  { empId: 103, name: "Grace",  age: 22, department: "IT",      salary: 45000 },
+  { empId: 104, name: "Heidi",  age: 40, department: "Finance", salary: 80000 },
+  { empId: 105, name: "Ivan",   age: 31, department: "Finance", salary: 30000 },
+  { empId: 106, name: "Judy",   age: 27, department: "IT",      salary: 50000 }
+]);
+
+db.products.insertMany([
+  { productId: 1, name: "Phone X",     category: "mobile", price: 40000, stock: 50,  ratings: [4, 5, 3] },
+  { productId: 2, name: "Laptop Pro",  category: "laptop", price: 70000, stock: 20,  ratings: [5, 5, 4] },
+  { productId: 3, name: "Earbuds",     category: "audio",  price: 2000,  stock: 100, ratings: [3, 2, 4] }
+]);
+
+db.articles.insertMany([
+  { _id: 1, title: "Intro to JS",      tags: ["javascript", "programming", "web"] },
+  { _id: 2, title: "Advanced MongoDB", tags: ["database", "nosql"] },
+  { _id: 3, title: "React Guide",      tags: ["javascript", "react"] }
+]);
+
+db.students.insertMany([
+  { _id: 1, name: "Student A", department: "CSE", marks: { math: 95, physics: 88 } },
+  { _id: 2, name: "Student B", department: "ECE", marks: { math: 82, physics: 90 } },
+  { _id: 3, name: "Student C", department: "CSE", marks: { math: 91, physics: 85 } },
+  { _id: 4, name: "Student D", department: "ME",  marks: { math: 76, physics: 80 } }
+]);
+
+db.customers.insertMany([
+  { customerId: 1, name: "Customer One",   email: "c1@example.com" },
+  { customerId: 2, name: "Customer Two",   email: "c2@example.com" },
+  { customerId: 3, name: "Customer Three", email: "c3@example.com" }
+]);
+
+db.orders.insertMany([
+  { _id: 1, orderId: "ORD001", customerId: 1, orderDate: new ISODate("2024-02-15T10:00:00Z"), amount: 5000 },
+  { _id: 2, orderId: "ORD002", customerId: 2, orderDate: new ISODate("2023-11-20T09:30:00Z"), amount: 7000 },
+  { _id: 3, orderId: "ORD003", customerId: 1, orderDate: new ISODate("2024-08-05T14:20:00Z"), amount: 12000 },
+  { _id: 4, orderId: "ORD004", customerId: 3, orderDate: new ISODate("2025-01-10T12:00:00Z"), amount: 9000 }
+]);
+
+db.users.find({ age: { $gt: 20 } });
+
+db.users.find({ status: "active", role: "admin" });
+
+db.employees.find({ salary: { $gte: 30000, $lte: 50000 } });
+
+db.products.find({ category: { $in: ["mobile", "laptop"] } });
+
+db.users.find({}, { _id: 0, name: 1, email: 1 });
+
+db.employees.find().sort({ age: -1 });
+
+db.employees.find().sort({ salary: -1 }).limit(5);
+
+db.articles.find({ tags: "javascript" });
+
+db.users.find({ age: { $exists: false } });
+
+db.users.countDocuments();
+
+db.employees.updateOne(
+  { empId: 101 },
+  { $set: { salary: 65000 } }
+);
+
+db.products.updateOne(
+  { productId: 1 },
+  { $inc: { stock: 10 } }
+);
+
+db.users.deleteOne({ email: "xyz@gmail.com" });
+
+db.users.deleteMany({ status: "inactive" });
+
+db.orders.find({
+  orderDate: {
+    $gte: new ISODate("2024-01-01T00:00:00Z"),
+    $lt: new ISODate("2025-01-01T00:00:00Z")
+  }
+});
+
+db.products.find({ ratings: { $elemMatch: { $gt: 4 } } });
+
+db.students.find({ "marks.math": { $gt: 90 } });
+
+db.students.aggregate([
+  {
+    $group: {
+      _id: "$department",
+      count: { $sum: 1 }
+    }
+  }
+]);
+
+db.employees.aggregate([
+  {
+    $group: {
+      _id: "$department",
+      averageSalary: { $avg: "$salary" }
+    }
+  }
+]);
+
+db.orders.aggregate([
+  {
+    $lookup: {
+      from: "customers",
+      localField: "customerId",
+      foreignField: "customerId",
+      as: "customerDetails"
+    }
+  }
+]);
+
+db.users.find().pretty();
+db.employees.find().pretty();
+db.products.find().pretty();
+db.articles.find().pretty();
+db.students.find().pretty();
+db.customers.find().pretty();
+db.orders.find().pretty();
