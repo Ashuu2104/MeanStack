@@ -1,0 +1,144 @@
+// Data Modeling 
+// what is data modeling?
+// Data modeling is the process of creating a visual representation of a complex data system.
+// It helps to organize and structure data in a way that is easy to understand and use.
+// Data modeling is important because it helps to ensure that data is accurate, consistent, and reliable.
+// It also helps to improve data quality and reduce data redundancy.
+// Data modeling is used in a variety of fields, including software development, database design, and business intelligence.
+// There are several different types of data models, including conceptual, logical, and physical data models.
+// Each type of data model serves a different purpose and is used at different stages of the data modeling process.
+// In MongoDB, data modeling involves designing the structure of documents and collections to optimize performance and scalability.
+// MongoDB is a NoSQL database that uses a flexible schema, allowing for dynamic and hierarchical data structures.
+
+show dbs;
+use 'Parul';
+db.dropDatabase();
+db.createCollection("Faculty_embedded", {
+    validator: {
+        $jsonSchema: {
+            bsonType: "object",
+            required: ["name", "age", "role", "dept", "sub"],
+            properties: {
+                name: {
+                    bsonType: "string"
+                },
+                age: {
+                    bsonType: "int"
+                },
+                role: {
+                    bsonType: "string"
+                },
+                dept: {
+                    bsonType: "string"
+                },
+                sub: {
+                    bsonType: "array",
+                    items: {
+                        bsonType: "object",
+                        required: ["subjectName", "Semester"],
+                        properties: {
+                            subjectName: {
+                                bsonType: "string"
+                            },
+                            Semester: {
+                                bsonType: "string"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    validationLevel: "moderate"
+});
+
+
+
+db.Faculty_embedded.insertMany([
+    {
+        name: "Dr.Susruthi",
+        age: 24,
+        role: "Associate Professor",
+        dept: "Computer Science",
+        sub: [{ subjectName: "Data Structures", Semester: "5th" }, { subjectName: "Algorithms", Semester: "3rd" }]
+    },
+    {
+        name: "Dr.Mohit Rathod",
+        age: 45,
+        role: "Professor",
+        dept: "Machine Learning",
+        sub: [{ subjectName: "AI", Semester: "6th" }, { subjectName: "ML", Semester: "6th" }]
+    },
+    {
+        name: "Dr.Ritika Patel",
+        age: 26,
+        role: "Mentor",
+        dept: "Mobile Development",
+        sub: [{ subjectName: "Android Development", Semester: "6th" }, { subjectName: "iOS Development", Semester: "7th" }]
+    },
+    {
+        name: "Dr.Akash Singh",
+        age: 30,
+        role: "Assistant Professor",
+        dept: "Data Science",
+        sub: [{ subjectName: "Data Analysis", Semester: "5th" }, { subjectName: "Data Visualization", Semester: "4th" }]
+    }
+]);
+
+
+
+db.createCollection("Faculty_referenced", {
+    validator: {
+        $jsonSchema: {
+            bsonType: "object",
+            required: ["_id", "name", "Semester"],
+            properties: {
+                _id: {
+                    bsonType: "int"
+                },
+                name: {
+                    bsonType: "string"
+                },
+                Semester: {
+                    bsonType: "string"
+                }
+            }
+        }
+    },
+    validationLevel: "moderate"
+});
+
+db.Faculty_referenced.insertMany([
+    { _id: 101, name: "Data Structures", Semester: "5th" },
+    { _id: 102, name: "Algorithms", Semester: "3rd" },
+    { _id: 103, name: "AI", Semester: "6th" },
+    { _id: 104, name: "ML", Semester: "6th" },
+    { _id: 105, name: "Android Development", Semester: "6th" },
+    { _id: 106, name: "iOS Development", Semester: "7th" },
+    { _id: 107, name: "Data Analysis", Semester: "5th" },
+    { _id: 108, name: "Data Visualization", Semester: "4th" }
+]);
+
+db.Faculty_referenced.insertMany([
+    { name: "Dr.Susruthi", age: 24, role: "Associate Professor", dept: "Computer Science", subIds: [101, 102] },
+    { name: "Dr.Mohit Rathod", age: 45, role: "Professor", dept: "Machine Learning", subIds: [103, 104] },
+    { name: "Dr.Ritika Patel", age: 26, role: "Mentor", dept: "Mobile Development", subIds: [105, 106] },
+    { name: "Dr.Akash Singh", age: 30, role: "Assistant Professor", dept: "Data Science", subIds: [107, 108] }
+]);
+
+db.Faculty_referenced.aggregate([
+    {
+        $lookup: {
+            from: "Faculty_referenced",
+            localField: "subIds",
+            foreignField: "_id",
+            as: "subjects"
+        }
+    },
+    {
+        $match: { name: "Dr.Susruthi" }
+    }
+]);
+
+db.Faculty_embedded.find({});
+db.Faculty_referenced.find({});

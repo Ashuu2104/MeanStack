@@ -1,4 +1,5 @@
 show dbs;
+
 use('Practicals')
 
 db.createCollection("users");
