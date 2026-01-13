@@ -61,3 +61,15 @@ function fetchData(callback) {
 fetchData((data) => {
     console.log("Received:", data); // Output: Received: Sample Data
 });
+
+let user
+function fetchUser(callback){
+    setTimeout(()=>{
+        const user = {id : 7006,name : "Ashu"};
+        callback(user);
+    }, 1000);
+}
+
+fetchUser((user) => {
+    console.log("HELLO : ", user.name);
+});
